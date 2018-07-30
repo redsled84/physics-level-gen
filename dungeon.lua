@@ -8,33 +8,35 @@ local compare = function(a, b) if a:length() < b:length() then return a end end
 function getMST(rooms)
 	local points = { }
 	for i = 1, #rooms do
-	  local x, y
-	  x, y = math.floor(rooms[i].x + rooms[i].w / 2), math.floor(rooms[i].y + rooms[i].h / 2)
-	  points[#points + 1] = Point(x, y)
+        local x, y
+        if rooms[i].w >= _G.roomWidth or rooms[i].h >= _G.roomHeight then
+            x, y = math.floor(rooms[i].x + rooms[i].w / 2), math.floor(rooms[i].y + rooms[i].h / 2)
+            points[#points + 1] = Point(x, y)
+        end
 	end
 	local edges = { }
 	local triangles = Delaunay.triangulate(unpack(points))
 	for i = 1, #triangles do
-	  local p1, p2, p3
-	  p1, p2, p3 = triangles[i].p1, triangles[i].p2, triangles[i].p3
-	  local e1, e2, e3
-	  e1, e2, e3 = Edge(p1, p2), Edge(p2, p3), Edge(p1, p3)
-	  if #edges > 1 then
-	    if not edgeAdded(edges, e1) then
-	      edges[#edges + 1] = e1
-	    end
-	    if not edgeAdded(edges, e2) then
-	      edges[#edges + 1] = e2
-	    end
-	    if not edgeAdded(edges, e3) then
-	      edges[#edges + 1] = e3
-	    end
-	  else
-	    edges[#edges + 1] = e1
-	    edges[#edges + 1] = e2
-	    edges[#edges + 1] = e3
-	  end
-	end
+        local p1, p2, p3
+        p1, p2, p3 = triangles[i].p1, triangles[i].p2, triangles[i].p3
+        local e1, e2, e3
+        e1, e2, e3 = Edge(p1, p2), Edge(p2, p3), Edge(p1, p3)
+        if #edges > 1 then
+            if not edgeAdded(edges, e1) then
+                edges[#edges + 1] = e1
+            end
+            if not edgeAdded(edges, e2) then
+                edges[#edges + 1] = e2
+            end
+            if not edgeAdded(edges, e3) then
+                edges[#edges + 1] = e3
+            end
+        else
+            edges[#edges + 1] = e1
+            edges[#edges + 1] = e2
+            edges[#edges + 1] = e3
+        end
+    end
 	table.sort(edges, compare)
 	return Kruskals(points, edges), edges
 end

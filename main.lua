@@ -19,6 +19,7 @@ function newBox(x, y, w, h)
     return o
 end
 
+_G.roomWidth, _G.roomHeight = 70, 50
 function drawBodies()
     for i = 1, #bodies do
         local pbody = bodies[i]
@@ -26,7 +27,7 @@ function drawBodies()
             love.graphics.setColor(0, 0, .3, .3)
         else
             love.graphics.setColor(.3, .3, 0)
-            if pbody.w >= 70 or pbody.h >= 50 then
+            if pbody.w >= _G.roomWidth or pbody.h >= _G.roomHeight then
                 love.graphics.setColor(.6, .1, .1)
             end
         end
