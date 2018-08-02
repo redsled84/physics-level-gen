@@ -26,28 +26,44 @@ function drawBodies()
         if pbody.body:isAwake() then
             love.graphics.setColor(0, 0, .3, .3)
         else
-            love.graphics.setColor(.3, .3, 0)
+            love.graphics.setColor(.3, .3, 0, 0)
             if pbody.w >= _G.roomWidth or pbody.h >= _G.roomHeight then
                 love.graphics.setColor(.6, .1, .1)
             end
         end
         love.graphics.polygon("fill", pbody.body:getWorldPoints(pbody.shape:getPoints()))
         love.graphics.rectangle("fill", pbody.x, pbody.y, pbody.w, pbody.h)
-        love.graphics.setColor(.2, .2, .8, .9)
+        love.graphics.setColor(.2, .2, .8, .3)
         love.graphics.polygon("line", pbody.body:getWorldPoints(pbody.shape:getPoints()))
         love.graphics.rectangle("line", pbody.x, pbody.y, pbody.w, pbody.h)
 
     end
 end
 
+function slope(edge)
+    if math.abs(edge.p1.x - edge.p2.x) <= 2 or math.abs(edge.p1.y - edge.p2.y) <= 2 then
+        return 0
+    end
+    return (edge.p1.y - edge.p2.y) / (edge.p1.x - edge.p2.x)
+end
+
 function drawTree(canDraw, tree)
     if not canDraw then return end
-    love.graphics.setColor(0, .9, .2)
     for i = 1, #tree do
         local edge = tree[i]
-        love.graphics.line(edge.p1.x, edge.p1.y, edge.p2.x, edge.p2.y)
-        love.graphics.circle("line", edge.p1.x, edge.p1.y, 5)
-        love.graphics.circle("line", edge.p2.x, edge.p2.y, 5)
+        -- visualize the MST
+        love.graphics.setColor(0, .9, .2)
+--        love.graphics.line(edge.p1.x, edge.p1.y, edge.p2.x, edge.p2.y)
+--        love.graphics.circle("line", edge.p1.x, edge.p1.y, 5)
+--        love.graphics.circle("line", edge.p2.x, edge.p2.y, 5)
+        -- draw paths between rooms
+        love.graphics.setColor(0.8, 0.7, 1)
+        if math.abs(slope(edge)) == 0 then
+            love.graphics.line(edge.p1.x, edge.p1.y, edge.p2.x, edge.p2.y)
+        else
+            love.graphics.line(edge.p1.x, edge.p2.y, edge.p2.x, edge.p2.y)
+            love.graphics.line(edge.p1.x, edge.p2.y, edge.p1.x, edge.p1.y)
+        end
     end
 end
 
@@ -70,7 +86,7 @@ function love.load()
         local h = math.random(4, 7) * 10
         table.insert(bodies, newBox(x, y, w, h))
     end
-    for i = 1, 45 do
+    for i = 1, 35 do
         local x, y = getRandomPoint(screenWidth / 2, screenHeight / 2, 200)
         local w = math.random(4, 7) * 10
         local h = math.random(3, 5) * 10
@@ -118,8 +134,8 @@ function love.update(dt)
 end
 
 function love.draw()
-    drawBodies()
     drawTree(allSleep, tree)
+    drawBodies()
 end
 
 function love.keypressed(key)
